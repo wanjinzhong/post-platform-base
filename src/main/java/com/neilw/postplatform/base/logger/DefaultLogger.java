@@ -28,6 +28,11 @@ public class DefaultLogger implements Logger {
     }
 
     @Override
+    public void pure(String message) {
+        System.out.println(message);
+    }
+
+    @Override
     public void flush() {
 
     }
