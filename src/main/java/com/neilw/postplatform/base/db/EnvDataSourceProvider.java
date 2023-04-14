@@ -23,13 +23,16 @@ public class EnvDataSourceProvider implements DataSourceProvider {
             url = System.getProperty(String.format("DB_%s_%s_URL", upperName, env.upper()));
             userName = System.getProperty(String.format("DB_%s_%s_USERNAME", upperName, env.upper()));
             password = System.getProperty(String.format("DB_%s_%s_PASSWORD", upperName, env.upper()));
+            if (StringUtils.isAnyBlank(url, userName, password) ) {
+                throw new RuntimeException(String.format("DataSouce %s for %s is not configured.", upperName, env.upper()));
+            }
         } else {
             url = System.getProperty(String.format("DB_%s_URL", upperName));
             userName = System.getProperty(String.format("DB_%s_USERNAME", upperName));
             password = System.getProperty(String.format("DB_%s_PASSWORD", upperName));
-        }
-        if (StringUtils.isAnyBlank(url, userName, password) ) {
-            throw new RuntimeException(String.format("DataSouce %s is not configured.", upperName));
+            if (StringUtils.isAnyBlank(url, userName, password) ) {
+                throw new RuntimeException(String.format("DataSouce %s is not configured.", upperName));
+            }
         }
         return new SimpleDataSource(url, userName, password, MysqlDialect.class.getName());
     }
