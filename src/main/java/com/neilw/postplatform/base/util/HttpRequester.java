@@ -8,18 +8,21 @@ import com.google.gson.reflect.TypeToken;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpRequester {
+    private static final String AUTHORIZATION = "Authorization";
+    private static final String COOKIE = "Cookie";
     private Method method;
     private String url;
     private Map<String, String> pathVariable = new HashMap<>();
     private Map<String, Object> requestParams = new HashMap<>();
     private Map<String, List<String>> headers = new HashMap<>();
     private String loginId;
+    private String token;
+    private String cookie;
     private Object body;
 
     public static HttpRequester get(String url) {
@@ -83,6 +86,17 @@ public final class HttpRequester {
         this.loginId = loginId;
         return this;
     }
+
+    public HttpRequester token(String token) {
+        this.token = token;
+        return this;
+    }
+
+    public HttpRequester cookie(String cookie) {
+        this.cookie = cookie;
+        return this;
+    }
+
     public HttpRequester body(Object body) {
         this.body = body;
         return this;
@@ -110,13 +124,21 @@ public final class HttpRequester {
             loginId = "synnex-web";
         }
         HttpRequest request = HttpRequest.of(actUrl).setMethod(method)
-                .contentType("application/json")
-                .header(headers)
-                .bearerAuth(TokenGenerator.generate(loginId));
+                .contentType("application/json");
+
         if (body != null) {
             request.body(new Gson().toJson(body));
         }
         request.form(requestParams);
+        if (StringUtils.isNotBlank(cookie)) {
+            header(COOKIE, Collections.singletonList(cookie));
+        } else if (StringUtils.isNotBlank(token)) {
+            header(AUTHORIZATION, Collections.singletonList(token));
+        } else {
+            headers.remove(AUTHORIZATION);
+            request.bearerAuth(TokenGenerator.generate(loginId));
+        }
+        request.header(headers);
         HttpResponse response = request.execute();
         if (response.getStatus() == 404) {
             throw new RuntimeException(String.format("404: page not found %s", actUrl));
