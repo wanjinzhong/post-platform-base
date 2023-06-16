@@ -4,6 +4,7 @@ import com.neilw.postplatform.base.constants.CommonConstants;
 import com.neilw.postplatform.base.logger.Logger;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.lang.reflect.Method;
@@ -22,14 +23,18 @@ public class JdbcInterceptor implements MethodInterceptor {
     public JdbcInterceptor(Logger logger) {
         this.logger = logger;
         String timeoutStr = System.getProperty(CommonConstants.SQL_TIMEOUT);
-        try {
-            long timeout = Long.parseLong(timeoutStr);
-            if (timeout <= 0) {
-                throw new RuntimeException();
+        if (StringUtils.isBlank(timeoutStr)) {
+            logger.warn(String.format("Missing config for sql timeout, use default [%s] instead.", sqlTimeout));
+        } else {
+            try {
+                long timeout = Long.parseLong(timeoutStr);
+                if (timeout <= 0) {
+                    throw new RuntimeException();
+                }
+                sqlTimeout = timeout;
+            } catch (Exception e) {
+                logger.warn(String.format("Error config for sql timeout [%s], use default [%s] instead.", timeoutStr, sqlTimeout));
             }
-            sqlTimeout = timeout;
-        } catch (Exception e) {
-            logger.warn(String.format("Error config for sql timeout [%s], use default [%s] instead.", timeoutStr, sqlTimeout));
         }
     }
 
