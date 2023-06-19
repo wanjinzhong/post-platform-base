@@ -22,7 +22,7 @@ public class JdbcInterceptor implements MethodInterceptor {
     }
     public JdbcInterceptor(Logger logger) {
         this.logger = logger;
-        String timeoutStr = System.getProperty(CommonConstants.SQL_TIMEOUT);
+        String timeoutStr = System.getenv(CommonConstants.SQL_TIMEOUT);
         if (StringUtils.isBlank(timeoutStr)) {
             logger.warn(String.format("Missing config for sql timeout, use default [%s] instead.", sqlTimeout));
         } else {
@@ -55,14 +55,13 @@ public class JdbcInterceptor implements MethodInterceptor {
             }
             return future.get(sqlTimeout, TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {
+            if (!future.isCancelled()) {
+                future.cancel(true);
+            }
             if (objects != null && objects.length > 0) {
                 throw new RuntimeException(String.format("SQL execution timeout for %dms: [%s] %s", sqlTimeout, methodProxy.getSignature().getName(), objects[0]));
             } else {
                 throw new RuntimeException(String.format("SQL execution timeout for %dms: [%s]", sqlTimeout, methodProxy.getSignature().getName()));
-            }
-        } finally {
-            if (!future.isCancelled() && !future.isDone()) {
-                future.cancel(true);
             }
         }
     }
