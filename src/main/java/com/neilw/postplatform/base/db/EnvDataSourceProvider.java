@@ -15,6 +15,9 @@ public class EnvDataSourceProvider implements DataSourceProvider {
 
     @Override
     public DataSource getDataSource(String name, DBEnv env) {
+        if (StringUtils.isBlank(name)) {
+            throw new RuntimeException("Database name is not provided.");
+        }
         String upperName = StringUtils.upperCase(name);
         String url;
         String userName;
@@ -24,14 +27,14 @@ public class EnvDataSourceProvider implements DataSourceProvider {
             userName = System.getProperty(String.format("DB_%s_%s_USERNAME", upperName, env.upper()));
             password = System.getProperty(String.format("DB_%s_%s_PASSWORD", upperName, env.upper()));
             if (StringUtils.isAnyBlank(url, userName, password) ) {
-                throw new RuntimeException(String.format("DataSouce %s for %s is not configured.", upperName, env.upper()));
+                throw new RuntimeException(String.format("DataSource %s for %s is not configured.", upperName, env.upper()));
             }
         } else {
             url = System.getProperty(String.format("DB_%s_URL", upperName));
             userName = System.getProperty(String.format("DB_%s_USERNAME", upperName));
             password = System.getProperty(String.format("DB_%s_PASSWORD", upperName));
             if (StringUtils.isAnyBlank(url, userName, password) ) {
-                throw new RuntimeException(String.format("DataSouce %s is not configured.", upperName));
+                throw new RuntimeException(String.format("DataSource %s is not configured.", upperName));
             }
         }
         return new SimpleDataSource(url, userName, password, MysqlDialect.class.getName());

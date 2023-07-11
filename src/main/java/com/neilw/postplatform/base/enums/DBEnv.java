@@ -1,10 +1,15 @@
 package com.neilw.postplatform.base.enums;
 
 public enum DBEnv {
+    DEV,
+    DEV_US,
+    DEV_UK,
+    DEV_CN,
+    DEV_WW,
     UAT,
     UAT_US,
     UAT_UK,
-    UAT_CK,
+    UAT_CN,
     UAT_WW,
     PROD,
     PROD_US,

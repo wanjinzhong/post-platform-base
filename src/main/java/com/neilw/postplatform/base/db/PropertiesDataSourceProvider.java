@@ -16,10 +16,14 @@ public class PropertiesDataSourceProvider implements DataSourceProvider {
 
     @Override
     public DataSource getDataSource(String name, DBEnv env) {
+        if (StringUtils.isBlank(name)) {
+            throw new RuntimeException("Database name is not provided.");
+        }
         Props props = new Props("db.properties");
         String url;
         String userName;
         String password;
+        name = StringUtils.toRootLowerCase(name);
         if (env != null) {
             url = props.getProperty(String.format("db.%s.%s.url", name, env.lower()));
             userName = props.getProperty(String.format("db.%s.%s.username", name, env.lower()));
@@ -30,13 +34,13 @@ public class PropertiesDataSourceProvider implements DataSourceProvider {
             password = props.getProperty(String.format("db.%s.password", name));
         }
         if (StringUtils.isBlank(url)) {
-            throw new RuntimeException(String.format("url for datasource %s is not present.", name));
+            throw new RuntimeException(String.format("Url for datasource %s is not present.", name));
         }
         if (StringUtils.isBlank(userName)) {
-            throw new RuntimeException(String.format("username for datasource %s is not present.", name));
+            throw new RuntimeException(String.format("Username for datasource %s is not present.", name));
         }
         if (StringUtils.isBlank(password)) {
-            throw new RuntimeException(String.format("password for datasource %s is not present.", name));
+            throw new RuntimeException(String.format("Password for datasource %s is not present.", name));
         }
         return new SimpleDataSource(url, userName, password);
     }

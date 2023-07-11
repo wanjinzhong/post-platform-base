@@ -5,7 +5,6 @@ import com.neilw.postplatform.base.logger.Logger;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.*;
