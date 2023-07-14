@@ -1,13 +1,24 @@
 package com.neilw.postplatform.base.interceptor;
 
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
+import com.neilw.postplatform.base.constants.AvailableDbMethods;
 import com.neilw.postplatform.base.constants.CommonConstants;
+import com.neilw.postplatform.base.exception.InvalidMethodException;
 import com.neilw.postplatform.base.logger.Logger;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
+import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class JdbcInterceptor implements MethodInterceptor {
 
@@ -38,12 +49,22 @@ public class JdbcInterceptor implements MethodInterceptor {
     }
 
     @Override
-    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+    public Object intercept(Object db, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+        AtomicReference<String> time = new AtomicReference<>();
+        AtomicReference<String> originSql = new AtomicReference<>();;
         FutureTask<Object> future = new FutureTask<>(() -> {
             try {
-                return methodProxy.invokeSuper(o, objects);
+                Integer sqlParamIndex = validateMethod(method);
+                time.set(String.valueOf(System.currentTimeMillis()));
+                if (sqlParamIndex != null) {
+                    originSql.set((String) objects[sqlParamIndex - 1]);
+                    objects[sqlParamIndex - 1] = "/*" + time.get() + "*/" + objects[sqlParamIndex - 1];
+                }
+                return methodProxy.invokeSuper(db, objects);
+            } catch (InvalidMethodException e) {
+                throw e;
             } catch (Throwable e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(e.getMessage(), e);
             }
         });
         try {
@@ -57,11 +78,44 @@ public class JdbcInterceptor implements MethodInterceptor {
             if (!future.isCancelled()) {
                 future.cancel(true);
             }
-            if (objects != null && objects.length > 0) {
-                throw new RuntimeException(String.format("SQL execution timeout for %dms: [%s] %s", sqlTimeout, methodProxy.getSignature().getName(), objects[0]));
+            if (StringUtils.isNotBlank(originSql.get())) {
+                ((Db) db).query("select ID from information_schema.PROCESSLIST where COMMAND <> 'Sleep' and INFO like '%/*" + time.get() + "*/%' " +
+                                "and INFO not like '%from information_schema.PROCESSLIST%'")
+                        .forEach(entity -> {
+                            try {
+                                ((Db) db).execute("kill " + entity.getLong("ID"));
+                            } catch (SQLException ex) {
+                                logger.error("Failed to cancel to Sql execution.");
+                            }
+                        });
+                throw new SQLTimeoutException(String.format("SQL execution timeout for %dms: [%s] %s", sqlTimeout, methodProxy.getSignature().getName(), originSql.get()));
             } else {
-                throw new RuntimeException(String.format("SQL execution timeout for %dms: [%s]", sqlTimeout, methodProxy.getSignature().getName()));
+                throw new SQLTimeoutException(String.format("SQL execution timeout for %dms: [%s]", sqlTimeout, methodProxy.getSignature().getName()));
             }
+        }
+    }
+
+    private static Integer validateMethod(Method method) {
+        Map<Method, Integer> availableMethods = AvailableDbMethods.getMethods();
+        if (!availableMethods.containsKey(method)) {
+            List<String> suggest = availableMethods.keySet().stream().filter(m -> Objects.equals(m.getName(), method.getName()))
+                    .map(JdbcInterceptor::getMethodFullName).collect(Collectors.toList());
+            StringBuilder message = new StringBuilder().append("Db method for ").append(getMethodFullName(method)).append(" is invalid");
+            if (!CollectionUtils.isEmpty(suggest)) {
+                message.append("\nSuggest to use:\n");
+                message.append(String.join("\n", suggest));
+            }
+            throw new InvalidMethodException(message.toString());
+        }
+        return availableMethods.get(method);
+    }
+
+    private static String getMethodFullName(Method method) {
+        String returnType = method.getReturnType().getSimpleName();
+        if (ArrayUtils.isEmpty(method.getParameterTypes())) {
+            return returnType + " " + method.getName() + "()";
+        } else {
+            return returnType + " " + method.getName() + "(" + Arrays.stream(method.getParameterTypes()).map(Class::getSimpleName).collect(Collectors.joining(", ")) + ")";
         }
     }
 }
