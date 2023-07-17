@@ -5,6 +5,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.Method;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.neilw.postplatform.base.exception.http.HttpException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -140,8 +141,8 @@ public final class HttpRequester {
         }
         request.header(headers);
         HttpResponse response = request.execute();
-        if (response.getStatus() == 404) {
-            throw new RuntimeException(String.format("404: page not found %s", actUrl));
+        if (!Objects.equals(response.getStatus(), 200)) {
+            throw HttpException.of(response.getStatus(), response.body(), null);
         }
         return new Gson().fromJson(response.body(), new TypeToken<Map<String, Object>>(){}.getType());
     }
