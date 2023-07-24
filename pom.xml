@@ -6,7 +6,7 @@
 
     <groupId>com.neilw.postplatform</groupId>
     <artifactId>post-platform-base</artifactId>
-    <version>1.2</version>
+    <version>1.2-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -17,7 +17,6 @@
             <groupId>org.pf4j</groupId>
             <artifactId>pf4j</artifactId>
             <version>3.9.0</version>
-            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
@@ -80,28 +79,40 @@
     </properties>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <!-- 添加此项后，可直接使用mvn package | mvn install -->
-                <!-- 不添加此项，需直接使用mvn package assembly:single -->
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-assembly-plugin</artifactId>-->
+<!--                <version>3.3.0</version>-->
+<!--                <configuration>-->
+<!--                    <descriptorRefs>-->
+<!--                        <descriptorRef>jar-with-dependencies</descriptorRef>-->
+<!--                    </descriptorRefs>-->
+<!--                </configuration>-->
+<!--                &lt;!&ndash; 添加此项后，可直接使用mvn package | mvn install &ndash;&gt;-->
+<!--                &lt;!&ndash; 不添加此项，需直接使用mvn package assembly:single &ndash;&gt;-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>make-assembly</id>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>single</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
 
     </build>
+    <distributionManagement>
+        <repository>
+            <id>hyvex-repository-releases</id>
+            <name>Maven Hyvex</name>
+            <url>http://hyvex.synnex.org:10010/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>hyvex-repository-snapshots</id>
+            <name>Maven Hyvex</name>
+            <url>http://hyvex.synnex.org:10010/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
