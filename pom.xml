@@ -31,18 +31,28 @@
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
+            <artifactId>hutool-core</artifactId>
+            <version>5.8.21</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
             <artifactId>hutool-db</artifactId>
-            <version>5.8.16</version>
+            <version>5.8.21</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-poi</artifactId>
+            <version>5.8.21</version>
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-http</artifactId>
-            <version>5.8.16</version>
+            <version>5.8.21</version>
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-setting</artifactId>
-            <version>5.8.16</version>
+            <version>5.8.21</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -70,7 +80,16 @@
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.1-jre</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
+        </dependency>
     </dependencies>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
