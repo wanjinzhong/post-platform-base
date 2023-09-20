@@ -4,8 +4,11 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.neilw.postplatform.base.util.ExcelUtil;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public abstract class Publisher {
@@ -32,6 +35,14 @@ public abstract class Publisher {
                 .registerWriteHandler(new HorizontalCellStyleStrategy(ExcelUtil.defaultHeaderStyle(), ExcelUtil.defaultContentStyle()))
                 .doWrite(data);
         publish(new ByteArrayInputStream(outputStream.toByteArray()), fileName);
+    }
+
+    public <T> void publishExcel(Workbook workbook, String fileName) throws IOException {
+        ByteArrayOutputStream dstStream = new ByteArrayOutputStream();
+        workbook.write(dstStream);
+        byte[] bytes = dstStream.toByteArray();
+        ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
+        publish(byteStream, fileName);
     }
 
     public abstract void publish(InputStream inputStream, String fileName) throws IOException;

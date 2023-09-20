@@ -6,7 +6,7 @@
 
     <groupId>com.neilw.postplatform</groupId>
     <artifactId>post-platform-base</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2.2-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -53,6 +53,11 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-setting</artifactId>
             <version>5.8.21</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.0.31</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
