@@ -2,6 +2,8 @@ package com.neilw.postplatform.base.report;
 
 import com.neilw.postplatform.base.bo.ReportParam;
 import com.neilw.postplatform.base.db.DBHelper;
+import com.neilw.postplatform.base.enviromnent.Environment;
+import com.neilw.postplatform.base.enviromnent.LocalEnvironmentHelper;
 import com.neilw.postplatform.base.logger.DefaultLogger;
 import com.neilw.postplatform.base.logger.Logger;
 import com.neilw.postplatform.base.publish.DefaultPublisher;
@@ -15,7 +17,8 @@ public abstract class ReportService<T extends ReportParam> implements ExtensionP
 
      protected final DBHelper dbHelper = new DBHelper(logger);
 
-     public abstract void doReport(T params);
+     protected final Environment env = LocalEnvironmentHelper.getLocalEnv();
 
+     public abstract void doReport(T params) throws Throwable;
 
 }
