@@ -51,7 +51,7 @@ public final class ExcelUtil {
         return result;
     }
 
-    private Workbook read(File file) {
+    public static Workbook read(File file) {
         Workbook workbook;
         try {
             workbook = new XSSFWorkbook(file);
@@ -66,7 +66,7 @@ public final class ExcelUtil {
         }
         return workbook;
     }
-    private Workbook read(InputStream stream) {
+    public static Workbook read(InputStream stream) {
         Workbook workbook;
         try {
             workbook = new XSSFWorkbook(stream);
@@ -81,7 +81,7 @@ public final class ExcelUtil {
         }
         return workbook;
     }
-    private static String getCellStringValue(Row row, int cellIdx) {
+    public static String getCellStringValue(Row row, int cellIdx) {
         if (row == null || row.getCell(cellIdx) == null) {
             return null;
         }
@@ -90,7 +90,7 @@ public final class ExcelUtil {
         return cell.getStringCellValue();
     }
 
-    private static Double getCellNumberValue(Row row, int cellIdx) {
+    public static Double getCellNumberValue(Row row, int cellIdx) {
         if (row == null || row.getCell(cellIdx) == null) {
             return null;
         }
