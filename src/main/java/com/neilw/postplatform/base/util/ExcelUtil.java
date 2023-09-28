@@ -7,9 +7,15 @@ import com.alibaba.excel.write.metadata.style.WriteCellStyle;
 import com.alibaba.excel.write.metadata.style.WriteFont;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.NotOLE2FileException;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,5 +49,57 @@ public final class ExcelUtil {
             }
         }).sheet().doRead();
         return result;
+    }
+
+    private Workbook read(File file) {
+        Workbook workbook;
+        try {
+            workbook = new XSSFWorkbook(file);
+        } catch (Exception e) {
+            try {
+                workbook = new HSSFWorkbook(Files.newInputStream(file.toPath()));
+            } catch (NotOLE2FileException e1) {
+                throw new RuntimeException("Please open the excel file and do \"Save as\". Then re-upload to the tool");
+            } catch (Exception e2) {
+                throw new RuntimeException("Cannot open excel file ", e2);
+            }
+        }
+        return workbook;
+    }
+    private Workbook read(InputStream stream) {
+        Workbook workbook;
+        try {
+            workbook = new XSSFWorkbook(stream);
+        } catch (Exception e) {
+            try {
+                workbook = new HSSFWorkbook(stream);
+            } catch (NotOLE2FileException e1) {
+                throw new RuntimeException("Please open the excel file and do \"Save as\". Then re-upload to the tool");
+            } catch (Exception e2) {
+                throw new RuntimeException("Cannot open excel file ", e2);
+            }
+        }
+        return workbook;
+    }
+    private static String getCellStringValue(Row row, int cellIdx) {
+        if (row == null || row.getCell(cellIdx) == null) {
+            return null;
+        }
+        Cell cell = row.getCell(cellIdx);
+//        cell.setCellType(CellType.STRING);
+        return cell.getStringCellValue();
+    }
+
+    private static Double getCellNumberValue(Row row, int cellIdx) {
+        if (row == null || row.getCell(cellIdx) == null) {
+            return null;
+        }
+        Cell cell = row.getCell(cellIdx);
+        if (cell.getCellType() == CellType.NUMERIC) {
+            return cell.getNumericCellValue();
+        } else {
+            String cellValue = cell.getStringCellValue();
+            return StringUtils.isBlank(cellValue) ? null : Double.valueOf(cellValue);
+        }
     }
 }
