@@ -29,10 +29,11 @@ public final class ExcelUtil {
         style.setFillForegroundColor(IndexedColors.PALE_BLUE.index);
         WriteFont headWriteFont = new WriteFont();
         headWriteFont.setBold(true);
-        headWriteFont.setFontHeightInPoints((short)12);
+        headWriteFont.setFontHeightInPoints((short) 12);
         style.setWriteFont(headWriteFont);
         return style;
     }
+
     public static WriteCellStyle defaultContentStyle() {
         return new WriteCellStyle();
     }
@@ -44,6 +45,7 @@ public final class ExcelUtil {
             public void invoke(T data, AnalysisContext context) {
                 result.add(data);
             }
+
             @Override
             public void doAfterAllAnalysed(AnalysisContext context) {
             }
@@ -66,6 +68,7 @@ public final class ExcelUtil {
         }
         return workbook;
     }
+
     public static Workbook read(InputStream stream) {
         Workbook workbook;
         try {
@@ -81,6 +84,11 @@ public final class ExcelUtil {
         }
         return workbook;
     }
+
+    public static String getCellStringValue(Row row, String cellIdx) {
+        return getCellStringValue(row, convertCellIndex(cellIdx));
+    }
+
     public static String getCellStringValue(Row row, int cellIdx) {
         if (row == null || row.getCell(cellIdx) == null) {
             return null;
@@ -88,6 +96,10 @@ public final class ExcelUtil {
         Cell cell = row.getCell(cellIdx);
 //        cell.setCellType(CellType.STRING);
         return cell.getStringCellValue();
+    }
+
+    public static Double getCellNumberValue(Row row, String cellIdx) {
+        return getCellNumberValue(row, convertCellIndex(cellIdx));
     }
 
     public static Double getCellNumberValue(Row row, int cellIdx) {
@@ -101,5 +113,22 @@ public final class ExcelUtil {
             String cellValue = cell.getStringCellValue();
             return StringUtils.isBlank(cellValue) ? null : Double.valueOf(cellValue);
         }
+    }
+
+    public static int convertCellIndex(String cellIndex) {
+        cellIndex = cellIndex.toUpperCase();
+        int val = 0;
+        char[] chars = cellIndex.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            val += charToIntOffset(chars[i]) * Double.valueOf(Math.pow(26, chars.length - i - 1)).intValue();
+        }
+        return val - 1;
+    }
+
+    private static int charToIntOffset(char c) {
+        if (c < 65 || c > 90) {
+            throw new RuntimeException("Invalid Cell index");
+        }
+        return c - 'A' + 1;
     }
 }
