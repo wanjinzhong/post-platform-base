@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author neilwan
@@ -94,25 +95,38 @@ public final class ExcelUtil {
             return null;
         }
         Cell cell = row.getCell(cellIdx);
-//        cell.setCellType(CellType.STRING);
-        return cell.getStringCellValue();
+        return cell == null ?  null : new DataFormatter().formatCellValue(cell);
     }
 
     public static Double getCellNumberValue(Row row, String cellIdx) {
         return getCellNumberValue(row, convertCellIndex(cellIdx));
     }
 
+    public static Cell getCellAt(Row row, int cellIdx) {
+        return row.getCell(cellIdx);
+    }
+
+    public static Cell getCellAt(Row row, String cellIdx) {
+        return getCellAt(row, convertCellIndex(cellIdx));
+    }
+
+    public static Cell getNonNullCellAt(Row row, int cellIdx) {
+        Cell cell = row.getCell(cellIdx);
+        if (cell == null) {
+            cell = row.createCell(cellIdx);
+        }
+        return cell;
+    }
+
+    public static Cell getNonNullCellAt(Row row, String cellIdx) {
+        return getNonNullCellAt(row, convertCellIndex(cellIdx));
+    }
+
     public static Double getCellNumberValue(Row row, int cellIdx) {
         if (row == null || row.getCell(cellIdx) == null) {
             return null;
         }
-        Cell cell = row.getCell(cellIdx);
-        if (cell.getCellType() == CellType.NUMERIC) {
-            return cell.getNumericCellValue();
-        } else {
-            String cellValue = cell.getStringCellValue();
-            return StringUtils.isBlank(cellValue) ? null : Double.valueOf(cellValue);
-        }
+        return Optional.ofNullable(row.getCell(cellIdx)).map(cell -> new DataFormatter().formatCellValue(cell)).map(Double::valueOf).orElse(null);
     }
 
     public static int convertCellIndex(String cellIndex) {
