@@ -126,7 +126,8 @@ public final class ExcelUtil {
         if (row == null || row.getCell(cellIdx) == null) {
             return null;
         }
-        return Optional.ofNullable(row.getCell(cellIdx)).map(cell -> new DataFormatter().formatCellValue(cell)).map(Double::valueOf).orElse(null);
+        return Optional.ofNullable(row.getCell(cellIdx)).map(cell -> new DataFormatter().formatCellValue(cell)).filter(StringUtils::isNotBlank)
+                .map(Double::valueOf).orElse(null);
     }
 
     public static int convertCellIndex(String cellIndex) {
