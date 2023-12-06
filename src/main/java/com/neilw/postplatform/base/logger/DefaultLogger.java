@@ -1,5 +1,7 @@
 package com.neilw.postplatform.base.logger;
 
+import java.io.PrintStream;
+
 public class DefaultLogger implements Logger {
 
     @Override
@@ -25,9 +27,7 @@ public class DefaultLogger implements Logger {
     @Override
     public void error(Throwable e) {
         if (e.getStackTrace() != null) {
-            for (StackTraceElement element : e.getStackTrace()) {
-                error(element.toString());
-            }
+            e.printStackTrace();
         }
     }
 
