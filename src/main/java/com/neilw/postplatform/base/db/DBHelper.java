@@ -1,9 +1,7 @@
 package com.neilw.postplatform.base.db;
 
-import cn.hutool.db.Db;
 import cn.hutool.db.dialect.Dialect;
 import com.neilw.postplatform.base.enums.DBEnv;
-import com.neilw.postplatform.base.interceptor.JdbcInterceptor;
 import com.neilw.postplatform.base.logger.Logger;
 import net.sf.cglib.proxy.Enhancer;
 

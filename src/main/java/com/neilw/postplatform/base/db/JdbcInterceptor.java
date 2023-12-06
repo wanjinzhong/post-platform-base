@@ -1,11 +1,10 @@
-package com.neilw.postplatform.base.interceptor;
+package com.neilw.postplatform.base.db;
 
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
 import com.neilw.postplatform.base.constants.AvailableDbMethods;
 import com.neilw.postplatform.base.constants.CommonConstants;
 import com.neilw.postplatform.base.exception.InvalidMethodException;
 import com.neilw.postplatform.base.logger.Logger;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.apache.commons.collections4.CollectionUtils;
@@ -15,11 +14,18 @@ import org.apache.commons.lang3.StringUtils;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class JdbcInterceptor implements MethodInterceptor {
 
     private long sqlTimeout = 1000 * 60;
@@ -52,6 +58,9 @@ public class JdbcInterceptor implements MethodInterceptor {
     public Object intercept(Object db, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
         AtomicReference<String> time = new AtomicReference<>();
         AtomicReference<String> originSql = new AtomicReference<>();;
+        if (!method.getDeclaringClass().equals(Db.class) || method.getName().endsWith("System")) {
+            return methodProxy.invokeSuper(db, objects);
+        }
         FutureTask<Object> future = new FutureTask<>(() -> {
             try {
                 Integer sqlParamIndex = validateMethod(method);
@@ -79,15 +88,19 @@ public class JdbcInterceptor implements MethodInterceptor {
                 future.cancel(true);
             }
             if (StringUtils.isNotBlank(originSql.get())) {
-                ((Db) db).query("select ID from information_schema.PROCESSLIST where COMMAND <> 'Sleep' and INFO like '%/*" + time.get() + "*/%' " +
-                                "and INFO not like '%from information_schema.PROCESSLIST%'")
-                        .forEach(entity -> {
-                            try {
-                                ((Db) db).execute("kill " + entity.getLong("ID"));
-                            } catch (SQLException ex) {
-                                logger.error("Failed to cancel to Sql execution.");
-                            }
-                        });
+                try {
+                    ((Db) db).querySystem("select ID from information_schema.PROCESSLIST where COMMAND <> 'Sleep' and INFO like '%/*" + time.get() + "*/%' " +
+                                    "and INFO not like '%from information_schema.PROCESSLIST%'")
+                            .forEach(entity -> {
+                                try {
+                                    ((Db) db).executeSystem("kill " + entity.getLong("ID"));
+                                } catch (SQLException ex) {
+                                    logger.error("Failed to cancel to Sql execution.");
+                                }
+                            });
+                } catch (Exception notSupport) {
+                    log.error(notSupport.getMessage(), notSupport);
+                }
                 throw new SQLTimeoutException(String.format("SQL execution timeout for %dms: [%s] %s", sqlTimeout, methodProxy.getSignature().getName(), originSql.get()));
             } else {
                 throw new SQLTimeoutException(String.format("SQL execution timeout for %dms: [%s]", sqlTimeout, methodProxy.getSignature().getName()));

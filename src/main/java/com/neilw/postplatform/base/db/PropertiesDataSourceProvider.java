@@ -3,6 +3,7 @@ package com.neilw.postplatform.base.db;
 import cn.hutool.db.ds.simple.SimpleDataSource;
 import cn.hutool.setting.dialect.Props;
 import com.neilw.postplatform.base.enums.DBEnv;
+import com.neilw.postplatform.base.util.SqlUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.DataSource;
@@ -42,6 +43,6 @@ public class PropertiesDataSourceProvider implements DataSourceProvider {
         if (StringUtils.isBlank(password)) {
             throw new RuntimeException(String.format("Password for datasource %s is not present.", name));
         }
-        return new SimpleDataSource(url, userName, password);
+        return new SimpleDataSource(url, userName, password, SqlUtil.getJDBCDriver(url));
     }
 }

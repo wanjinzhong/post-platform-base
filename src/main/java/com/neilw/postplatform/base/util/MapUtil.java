@@ -1,14 +1,13 @@
 
 package com.neilw.postplatform.base.util;
 
+import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.MapUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class MapUtil {
+@NoArgsConstructor
+public final class MapUtil extends cn.hutool.core.map.MapUtil {
 
     public static <T, K> void putAll(Map<T, List<K>> map, T key, List<K> data) {
         List<K> items = map.getOrDefault(key, new ArrayList<>());
@@ -32,5 +31,22 @@ public class MapUtil {
         if (MapUtils.isNotEmpty(another)) {
             map.putAll(another);
         }
+    }
+    public static <T, K> Map<T, K> buildMap(Object... dataPair) {
+        Map<T, K> map = new HashMap<>();
+        if (dataPair == null || dataPair.length == 0) {
+            return map;
+        }
+        if (dataPair.length % 2 == 1) {
+            throw new RuntimeException("Wrong number of data");
+        }
+        for (int i = 0; i < dataPair.length / 2; i ++) {
+            map.put((T) dataPair[i*2], (K) dataPair[i*2+1]);
+        }
+        return map;
+    }
+
+    public static <K, V> Optional<V> get(Map<K, V> map, K key) {
+        return Optional.ofNullable(map.get(key));
     }
 }

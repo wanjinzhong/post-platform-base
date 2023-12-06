@@ -4,27 +4,31 @@ public class DefaultLogger implements Logger {
 
     @Override
     public void debug(String message) {
-        System.out.println(message);
+        System.out.println("[DEBUG] " + message);
     }
 
     @Override
     public void info(String message) {
-        System.out.println(message);
+        System.out.println("[INFO] " + message);
     }
 
     @Override
     public void warn(String message) {
-        System.out.println(message);
+        System.out.println("[WARN] " + message);
     }
 
     @Override
     public void error(String message) {
-        System.out.println(message);
+        System.err.println("[ERROR] " + message);
     }
 
     @Override
     public void error(Throwable e) {
-        e.printStackTrace();
+        if (e.getStackTrace() != null) {
+            for (StackTraceElement element : e.getStackTrace()) {
+                error(element.toString());
+            }
+        }
     }
 
     @Override

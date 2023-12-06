@@ -3,6 +3,7 @@ package com.neilw.postplatform.base.db;
 import cn.hutool.db.dialect.impl.MysqlDialect;
 import cn.hutool.db.ds.simple.SimpleDataSource;
 import com.neilw.postplatform.base.enums.DBEnv;
+import com.neilw.postplatform.base.util.SqlUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.DataSource;
@@ -37,6 +38,6 @@ public class EnvDataSourceProvider implements DataSourceProvider {
                 throw new RuntimeException(String.format("DataSource %s is not configured.", upperName));
             }
         }
-        return new SimpleDataSource(url, userName, password, MysqlDialect.class.getName());
+        return new SimpleDataSource(url, userName, password, SqlUtil.getJDBCDriver(url));
     }
 }

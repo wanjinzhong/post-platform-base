@@ -24,7 +24,7 @@ import java.util.Optional;
  * @author neilwan
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ExcelUtil {
+public final class ExcelUtil extends cn.hutool.poi.excel.ExcelUtil {
     public static WriteCellStyle defaultHeaderStyle() {
         WriteCellStyle style = new WriteCellStyle();
         style.setFillForegroundColor(IndexedColors.PALE_BLUE.index);
