@@ -1,6 +1,5 @@
 package com.neilw.postplatform.base.logger;
 
-import java.io.PrintStream;
 
 public class DefaultLogger implements Logger {
 

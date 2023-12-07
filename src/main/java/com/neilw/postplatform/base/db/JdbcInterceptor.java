@@ -58,7 +58,7 @@ public class JdbcInterceptor implements MethodInterceptor {
     public Object intercept(Object db, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
         AtomicReference<String> time = new AtomicReference<>();
         AtomicReference<String> originSql = new AtomicReference<>();;
-        if (!method.getDeclaringClass().equals(Db.class) || method.getName().endsWith("System")) {
+        if (!method.getDeclaringClass().equals(DbOps.class) || method.getName().endsWith("System")) {
             return methodProxy.invokeSuper(db, objects);
         }
         FutureTask<Object> future = new FutureTask<>(() -> {
@@ -89,11 +89,11 @@ public class JdbcInterceptor implements MethodInterceptor {
             }
             if (StringUtils.isNotBlank(originSql.get())) {
                 try {
-                    ((Db) db).querySystem("select ID from information_schema.PROCESSLIST where COMMAND <> 'Sleep' and INFO like '%/*" + time.get() + "*/%' " +
+                    ((DbOps) db).querySystem("select ID from information_schema.PROCESSLIST where COMMAND <> 'Sleep' and INFO like '%/*" + time.get() + "*/%' " +
                                     "and INFO not like '%from information_schema.PROCESSLIST%'")
                             .forEach(entity -> {
                                 try {
-                                    ((Db) db).executeSystem("kill " + entity.getLong("ID"));
+                                    ((DbOps) db).executeSystem("kill " + entity.getLong("ID"));
                                 } catch (SQLException ex) {
                                     logger.error("Failed to cancel to Sql execution.");
                                 }

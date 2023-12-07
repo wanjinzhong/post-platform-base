@@ -1,9 +1,11 @@
 package com.neilw.postplatform.base.db;
 
+import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
 import cn.hutool.db.dialect.Dialect;
 import com.neilw.postplatform.base.annotation.DbResultProperty;
 import com.neilw.postplatform.base.annotation.DbResultPropertyIgnore;
+import com.neilw.postplatform.base.logger.Logger;
 import com.neilw.postplatform.base.util.MapUtil;
 
 import javax.sql.DataSource;
@@ -14,37 +16,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Db extends cn.hutool.db.Db {
-    public Db(DataSource ds) {
+public class DbOps extends Db {
+    private Logger logger;
+    public DbOps(DataSource ds, Logger logger) {
         super(ds);
+        this.logger = logger;
     }
 
-    public Db(DataSource ds, String driverClassName) {
+    public DbOps(DataSource ds, String driverClassName, Logger logger) {
         super(ds, driverClassName);
+        this.logger = logger;
     }
 
-    public Db(DataSource ds, Dialect dialect) {
+    public DbOps(DataSource ds, Dialect dialect, Logger logger) {
         super(ds, dialect);
+        this.logger = logger;
     }
     @Override
     public List<Entity> query(String sql, Object... params) throws SQLException {
-        System.out.println(Thread.currentThread().getName() + "(" + getConnection() + ")"  + ": " + sql);
+        logger.debug("[SQL] " + sql);
         return super.query(sql, params);
     }
     public <T> List<T> query(String sql, Map<String, Object> params, Class<T> resultType) throws SQLException {
-        System.out.println(Thread.currentThread().getName() + "(" + getConnection() + ")"  + ": " + sql);
+        logger.debug("[SQL] " + sql);
         List<Entity> entities = super.query(sql, params);
         return buildData(resultType, entities);
     }
 
 
     protected List<Entity> querySystem(String sql, Object... params) throws SQLException {
-        System.out.println(Thread.currentThread().getName() + "(" + getConnection() + ")"  + ": " + sql);
+        logger.debug("[SQL] " + sql);
         return super.query(sql, params);
     }
 
     protected int executeSystem(String sql, Object... params) throws SQLException {
-        System.out.println(Thread.currentThread().getName() + "(" + getConnection() + ")"  + ": " + sql);
+        logger.debug("[SQL] " + sql);
         return super.execute(sql, params);
     }
 

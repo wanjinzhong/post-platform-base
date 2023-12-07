@@ -18,7 +18,7 @@ public abstract class ReportService<T extends ReportParam> implements ExtensionP
      protected final Logger logger = new DefaultLogger();
      protected final Publisher publisher = new DefaultPublisher();
 
-     protected final DBHelper dbHelper = new DBHelper(logger, new JdbcInterceptor(logger, Executors.newCachedThreadPool()));
+     protected final DBHelper dbHelper = new DBHelper(logger, new JdbcInterceptor(logger));
 
      protected final Environment env = LocalEnvironmentHelper.getLocalEnv();
 

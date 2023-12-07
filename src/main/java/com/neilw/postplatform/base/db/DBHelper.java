@@ -1,11 +1,14 @@
 package com.neilw.postplatform.base.db;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.db.dialect.Dialect;
 import com.neilw.postplatform.base.enums.DBEnv;
 import com.neilw.postplatform.base.logger.Logger;
 import net.sf.cglib.proxy.Enhancer;
+import sun.security.provider.MD5;
 
 import javax.sql.DataSource;
+import java.util.zip.Checksum;
 
 public class DBHelper {
     private Logger logger;
@@ -20,11 +23,11 @@ public class DBHelper {
         this.interceptor = interceptor;
     }
 
-    public Db getDb(String dbName, DBEnv env, Dialect dialect) {
+    public DbOps getDb(String dbName, DBEnv env, Dialect dialect) {
         Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(Db.class);
+        enhancer.setSuperclass(DbOps.class);
         enhancer.setCallback(interceptor);
-        return (Db) enhancer.create(new Class[]{DataSource.class, Dialect.class},
-                new Object[]{DataSourceProviderFactory.getProvider().getDataSource(dbName, env), dialect});
+        return (DbOps) enhancer.create(new Class[]{DataSource.class, Dialect.class, Logger.class},
+                new Object[]{DataSourceProviderFactory.getProvider().getDataSource(dbName, env), dialect, logger});
     }
 }
