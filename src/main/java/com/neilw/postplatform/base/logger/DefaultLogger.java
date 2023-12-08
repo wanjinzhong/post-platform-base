@@ -1,6 +1,8 @@
 package com.neilw.postplatform.base.logger;
 
 
+import com.neilw.postplatform.base.exception.BizException;
+
 public class DefaultLogger implements Logger {
 
     @Override
@@ -24,9 +26,16 @@ public class DefaultLogger implements Logger {
     }
 
     @Override
+    public void error(BizException e) {
+        if (e.getStackTrace() != null) {
+            e.printStackTrace(System.err);
+        }
+    }
+
+    @Override
     public void error(Throwable e) {
         if (e.getStackTrace() != null) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
     }
 
