@@ -6,7 +6,7 @@
 
     <groupId>com.neilw.postplatform</groupId>
     <artifactId>post-platform-base</artifactId>
-    <version>1.4.2-SNAPSHOT</version>
+    <version>1.4.3-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -31,32 +31,7 @@
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
-            <artifactId>hutool-core</artifactId>
-            <version>5.8.21</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-db</artifactId>
-            <version>5.8.21</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-json</artifactId>
-            <version>5.8.16</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-poi</artifactId>
-            <version>5.8.21</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-http</artifactId>
-            <version>5.8.21</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-setting</artifactId>
+            <artifactId>hutool-all</artifactId>
             <version>5.8.21</version>
         </dependency>
 <!--        DB driver-->
