@@ -7,6 +7,7 @@ import com.neilw.postplatform.base.annotation.DbResultProperty;
 import com.neilw.postplatform.base.annotation.DbResultPropertyIgnore;
 import com.neilw.postplatform.base.logger.Logger;
 import com.neilw.postplatform.base.util.MapUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
@@ -80,7 +81,7 @@ public class DbOps extends Db {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        entity.forEach((name, value) -> MapUtil.get(fieldMap, name).ifPresent(f -> {
+        entity.forEach((name, value) -> MapUtil.get(fieldMap, StringUtils.lowerCase(name)).ifPresent(f -> {
             try {
                 f.set(d, value);
             } catch (IllegalAccessException e) {
@@ -104,7 +105,7 @@ public class DbOps extends Db {
             if (property != null) {
                 name = property.value();
             }
-            fieldMap.put(name, field);
+            fieldMap.put(StringUtils.lowerCase(name), field);
         }
         return fieldMap;
     }
